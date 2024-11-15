@@ -21,7 +21,7 @@ public class Knife4jConfiguration {
                 // 是否启用Swagger，true启用，false不启用
                 .enable(true)
                 .apiInfo(new ApiInfoBuilder()
-                        .title("这是LiCoffee-Test-knife4j API ")
+                        .title("这是看旅行社管理系统api ")
                         .description("这是项目描述")
                         .termsOfServiceUrl("服务器URL")
                         .contact(new Contact("LiCoffee", null, "qiushiju0828@163.com"))

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -56,7 +58,7 @@ public class Employee implements Serializable {
     /**
      * 权限
      */
-    private String power;
+    private Integer power;
 
     /**
      * 状态

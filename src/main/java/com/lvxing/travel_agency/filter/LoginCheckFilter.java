@@ -29,6 +29,8 @@ public class LoginCheckFilter implements Filter {
         String[] urls = new String[]{
                 "/employee/login",
                 "/employee/logout",
+                "/admin/login",
+                "/admin/logout",
                 "/backend/**",
                 "/front/**",
                 "/user/sendMsg",
@@ -49,6 +51,23 @@ public class LoginCheckFilter implements Filter {
                 "/route/list",
                 "/user/sendMsg",
                 "/user/login",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
+        };
+        String[] EMPLOYEE_URLS = new String[]{
+                "/attractions/**",
+                "/common/**",
+                "/branchstore/**",
+                "/orders/**",
+                "/route/**",
+                "/user/**",
+                "/orders/**",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
         };
         //判断当前路径是否包含在白名单中
         boolean check = check(urls,requestURI);
@@ -58,14 +77,28 @@ public class LoginCheckFilter implements Filter {
             return;
         }
         //4-1判断登录状态是否登录
-        if (request.getSession().getAttribute("employee")!=null){
-            log.info("用户已登录，用户id为：{}",request.getSession().getAttribute("employee"));
-            Long empId = (Long) request.getSession().getAttribute("employee");
-            BaseContext.setCurrentId(empId);
+        if (request.getSession().getAttribute("admin")!=null){
+            log.info("管理员已登录，用户id为：{}",request.getSession().getAttribute("admin"));
+            Long adminId = (Long) request.getSession().getAttribute("admin");
+            BaseContext.setCurrentId(adminId);
             filterChain.doFilter(request,response);
             return;
         }
         //4-2判断登录状态是否登录
+        if (request.getSession().getAttribute("employee")!=null){
+            log.info("操作员已登录，用户id为：{}",request.getSession().getAttribute("employee"));
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            if (isRestricted(EMPLOYEE_URLS,requestURI)) {
+                log.info("访问成功：{}", requestURI);
+                BaseContext.setCurrentId(empId);
+                filterChain.doFilter(request,response);
+                return;
+            }
+            response.getWriter().write(JSON.toJSONString(R.error("EMPLOYEE_NO_POWER")));
+            log.info("操作员无权限访问");
+            return;
+        }
+        //4-3判断登录状态是否登录
         if (request.getSession().getAttribute("user")!=null){
             log.info("用户已登录，用户id为：{}",request.getSession().getAttribute("user"));
             Long userId = (Long) request.getSession().getAttribute("user");
