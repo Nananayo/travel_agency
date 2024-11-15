@@ -62,6 +62,7 @@ public class AttractionsController {
     @DeleteMapping
     @ApiOperation("删除景点")
     public R<String> delete(long ids){
+        attractionsService.removeById(ids);
 //        attractionsService.remove(ids);
         return R.success("删除成功");
     }
