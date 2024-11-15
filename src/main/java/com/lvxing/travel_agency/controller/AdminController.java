@@ -1,0 +1,67 @@
+package com.lvxing.travel_agency.controller;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lvxing.travel_agency.common.R;
+import com.lvxing.travel_agency.entity.Admin;
+import com.lvxing.travel_agency.entity.Employee;
+import com.lvxing.travel_agency.service.IAdminService;
+import com.lvxing.travel_agency.service.IEmployeeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author author
+ * @since 2024-11-15
+ */
+@RestController
+@RequestMapping("/admin")
+@Slf4j
+@Api(tags = "管理员接口")
+public class AdminController {
+    @Autowired
+    private IAdminService adminService;
+    @PostMapping("/login")
+    @ApiOperation("管理员登入")
+    public R<Admin> login(HttpServletRequest request, @RequestBody Admin admin) {
+
+        String password = admin.getPassword();
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
+        LambdaQueryWrapper<Admin> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Admin::getUsername, admin.getUsername());
+        admin = adminService.getOne(queryWrapper);
+        if(admin == null){
+            return R.error("用户名不存在");
+        }
+        if(!admin.getPassword().equals(password)){
+            return R.error("密码错误");
+        }
+        if(admin.getStatus() ==0){
+            return R.error("账号已禁用");
+        }
+        request.getSession().setAttribute("admin", admin.getId());
+
+        log.info("登录成功...");
+        return R.success(admin);
+    }
+    @PostMapping("/logout")
+    @ApiOperation("管理员登出")
+    public R<String> logout(HttpServletRequest request){
+        request.getSession().removeAttribute("admin");
+        return R.success("退出成功");
+    }
+
+
+}
