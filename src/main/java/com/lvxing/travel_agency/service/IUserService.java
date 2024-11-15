@@ -14,9 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2024-10-08
  */
 public interface IUserService extends IService<User> {
-    public void saveWithOrders(UserDto userDto);
-    public void updateWithOrders(UserDto userDto);
-    public void removeWithOrders(UserDto userDto);
-    public RouteDto getRouteWithOrders(Long id);
 
 }

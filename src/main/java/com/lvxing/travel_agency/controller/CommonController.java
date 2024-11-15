@@ -1,6 +1,8 @@
 package com.lvxing.travel_agency.controller;
 
 import com.lvxing.travel_agency.common.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +21,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/common")
 @Slf4j
+@Api(tags = "文件上传下载接口")
 public class CommonController {
     @Value("${travel.path}")
     private String basePath;
 
     @PostMapping("/upload")
+    @ApiOperation("上传")
     public R<String> upload(MultipartFile file){
         //原始文件名获取后缀
         String originFileName = file.getOriginalFilename();
@@ -44,6 +48,7 @@ public class CommonController {
         return R.success(fileName);
     }
     @GetMapping("/download")
+    @ApiOperation("下载")
     public void download(String name, HttpServletResponse response){
         try {
             //输入流

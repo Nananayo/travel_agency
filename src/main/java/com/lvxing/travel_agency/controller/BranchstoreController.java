@@ -8,6 +8,8 @@ import com.lvxing.travel_agency.dto.BranchDto;
 import com.lvxing.travel_agency.entity.Branchstore;
 import com.lvxing.travel_agency.service.IBranchstoreService;
 import com.lvxing.travel_agency.service.IRouteService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,18 +27,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/branchstore")
 @Slf4j
+@Api(tags = "分店接口")
 public class BranchstoreController {
     @Autowired
     private IBranchstoreService branchService;
     @Autowired
     private IRouteService routeService;
     @PostMapping("/save")
+    @ApiOperation("新增分店")
     public R<String> save(@RequestBody BranchDto branchDto)
     {
         branchService.saveWithRoute(branchDto);
         return R.success("添加成功");
     }
     @GetMapping("/page")
+    @ApiOperation("分页查询分店")
     public R<Page> page(int page, int pageSize, String name){
         Page<Branchstore> pageInfo = new Page(page,pageSize);
         LambdaQueryWrapper<Branchstore> queryWrapper = new LambdaQueryWrapper<>();
@@ -46,6 +51,7 @@ public class BranchstoreController {
         return R.success(pageInfo);
     }
     @GetMapping("/list")
+    @ApiOperation("获取分店列表")
     public R<List<Branchstore>> list(Branchstore branchstore){
         LambdaQueryWrapper<Branchstore> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(branchstore.getStatus()!=null,Branchstore::getStatus,branchstore.getStatus());
@@ -54,17 +60,20 @@ public class BranchstoreController {
         return R.success(list);
     }
     @PutMapping("/update")
+    @ApiOperation("更新分店信息")
     public R<String> update(@RequestBody BranchDto branchDto){
 
         branchService.updateWithRoute(branchDto);
         return R.success("修改成功");
     };
     @GetMapping("/{id}")
+    @ApiOperation("根据ID查找分店")
     public R<BranchDto> get(@PathVariable Long id){
         BranchDto branchDto = branchService.getBranchWithRoute(id);
         return R.success(branchDto);
     }
     @DeleteMapping
+    @ApiOperation("删除分店")
     public R<String> delete(BranchDto branchDto){
         branchService.removeWithRoute(branchDto);
         return R.success("删除成功");

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lvxing.travel_agency.common.R;
 import com.lvxing.travel_agency.entity.Employee;
 import com.lvxing.travel_agency.service.IEmployeeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
@@ -26,10 +28,12 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/employee")
 @Slf4j
+@Api(tags = "员工接口")
 public class EmployeeController {
     @Autowired
     private IEmployeeService employeeService;
     @PostMapping("/login")
+    @ApiOperation("员工登入")
     public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
 
         String password = employee.getPassword();
@@ -51,11 +55,13 @@ public class EmployeeController {
         return R.success(employee);
     }
     @PostMapping("/logout")
+    @ApiOperation("员工登出")
     public R<String> logout(HttpServletRequest request){
         request.getSession().removeAttribute("employee");
         return R.success("退出成功");
     }
     @PostMapping
+    @ApiOperation("新增员工")
     public R<String> save(@RequestBody Employee employee){
         log.info("新增员工成功，员工信息为{}",employee.toString());
 //        employee.setCreateTime(LocalDateTime.now());
@@ -65,6 +71,7 @@ public class EmployeeController {
         return R.success("新增员工成功");
     }
     @GetMapping("/page")
+    @ApiOperation("分页查询员工信息")
     public R<Page> page(int page, int pageSize,String name){
         log.info("page = {},pageSize = {},name = {}",page,pageSize,name);
         Page<Employee> pageInfo = new Page(page,pageSize);
@@ -74,6 +81,7 @@ public class EmployeeController {
         return R.success(pageInfo);
     }
     @PutMapping
+    @ApiOperation("更新员工信息")
     public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
         log.info("员工信息为{}",employee.toString());
 //        Long empId = (Long) request.getSession().getAttribute("employee");
@@ -83,6 +91,7 @@ public class EmployeeController {
         return R.success("员工信息修改成功");
     }
     @GetMapping("/{id}")
+    @ApiOperation("根据id查询员工信息")
     public R<Employee> getById(@PathVariable Long id){
         Employee employee = employeeService.getById(id);
         if (employee != null){

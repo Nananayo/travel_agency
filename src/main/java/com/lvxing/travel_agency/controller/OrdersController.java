@@ -8,6 +8,8 @@ import com.lvxing.travel_agency.entity.Orders;
 import com.lvxing.travel_agency.entity.User;
 import com.lvxing.travel_agency.service.IOrdersService;
 import com.lvxing.travel_agency.service.IUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/orders")
 @Slf4j
+@Api(tags = "订单接口")
 public class OrdersController {
     @Autowired
     private IOrdersService ordersService;
@@ -35,11 +38,13 @@ public class OrdersController {
     private IUserService userService;
 
     @GetMapping("/{id}")
+    @ApiOperation("根据id查询订单")
     public R<Orders> getById(@PathVariable Long id) {
         ordersService.getById(id);
         return R.success(ordersService.getById(id));
     }
     @PostMapping
+    @ApiOperation("新增订单")
     public R<String> save(@RequestBody Orders orders) {
         if (orders.getRouteId() == null){
             return R.error("请选择旅游线路");
@@ -56,6 +61,7 @@ public class OrdersController {
         return R.error("参数错误");
     }
     @PutMapping("/update")
+    @ApiOperation("更新订单")
     public R<String> update(@RequestBody Orders orders) {
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Orders::getUserId,BaseContext.getCurrentId());
@@ -68,6 +74,7 @@ public class OrdersController {
         return R.success("修改成功");
     }
     @GetMapping("/list")
+    @ApiOperation("获取订单列表")
     public R<List<Orders>> list(Orders orders) {
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(orders.getUserId() != null,Orders::getUserId,BaseContext.getCurrentId());

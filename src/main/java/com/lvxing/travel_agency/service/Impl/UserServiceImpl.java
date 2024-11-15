@@ -19,23 +19,4 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
-    @Override
-    public void saveWithOrders(UserDto userDto) {
-
-    }
-
-    @Override
-    public void updateWithOrders(UserDto userDto) {
-
-    }
-
-    @Override
-    public void removeWithOrders(UserDto userDto) {
-
-    }
-
-    @Override
-    public RouteDto getRouteWithOrders(Long id) {
-        return null;
-    }
 }

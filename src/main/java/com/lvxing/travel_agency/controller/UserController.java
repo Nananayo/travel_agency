@@ -7,6 +7,8 @@ import com.lvxing.travel_agency.common.R;
 import com.lvxing.travel_agency.entity.User;
 import com.lvxing.travel_agency.service.IUserService;
 import com.lvxing.travel_agency.utils.ValidateCodeUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,26 +28,31 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 @Slf4j
+@Api(tags = "用户接口")
 public class UserController {
     @Autowired
     private IUserService userService;
     @PostMapping
+    @ApiOperation("新增用户")
     public R<User> save(@RequestBody User user){
         userService.save(user);
         log.info("新增用户信息："+user);
         return R.success(user);
     }
     @GetMapping("/{id}")
+    @ApiOperation("根据用户ID查找")
     public R<User> getById(@PathVariable Long id){
         User user = userService.getById(id);
         return R.success(user);
     }
     @PutMapping
+    @ApiOperation("修改用户信息")
     public R<String> update(@RequestBody User user){
         userService.updateById(user);
         return R.success("个人信息修改成功");
     }
     @GetMapping("/page")
+    @ApiOperation("分页查询")
     public R<Page> page(int page, int pageSize,String name){
         Page<User> pageInfo = new  Page(page,pageSize);
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
@@ -54,6 +61,7 @@ public class UserController {
         return R.success(pageInfo);
     }
     @PostMapping("/sendMsg")
+    @ApiOperation("发送验证码")
     public R<String> sendMsg(@RequestBody User user, HttpSession session){
         if (user.getPhone()!=null){
         String code = ValidateCodeUtils.generateValidateCode(6).toString();
@@ -64,6 +72,7 @@ public class UserController {
         return R.error("发送失败");
     }
     @PostMapping("/login")
+    @ApiOperation("用户登录")
     public R<String> login(@RequestBody Map map, HttpSession session){
         log.info(map.toString());
 
