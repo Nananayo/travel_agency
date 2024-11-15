@@ -40,6 +40,7 @@ public class User implements Serializable {
     private Long idCard;
 
     private Integer status;
+    private Integer power;
 
 
 }

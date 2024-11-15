@@ -104,6 +104,7 @@ public class UserController {
                 userService.save(user);
             }
             session.setAttribute("user",user.getId());
+            session.setAttribute("power",user.getPower());
 
             //如果用户登录成功 删除缓存中的验证码
             //redisTemplate.delete(phone);
