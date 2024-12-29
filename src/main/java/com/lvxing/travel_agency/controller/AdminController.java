@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * <p>
@@ -35,7 +37,7 @@ public class AdminController {
     private IAdminService adminService;
     @PostMapping("/login")
     @ApiOperation("管理员登入")
-    public R<Admin> login(HttpServletRequest request, @RequestBody Admin admin) {
+    public R<String> login(HttpServletRequest request, @RequestBody Admin admin, HttpSession session) {
 
         String password = admin.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -54,7 +56,10 @@ public class AdminController {
         request.getSession().setAttribute("admin", admin.getId());
 
         log.info("登录成功...");
-        return R.success(admin);
+            ServletContext sc = request.getServletContext();
+            sc.setAttribute(session.getId(),session);
+
+        return R.success(session.getId());
     }
     @PostMapping("/logout")
     @ApiOperation("管理员登出")

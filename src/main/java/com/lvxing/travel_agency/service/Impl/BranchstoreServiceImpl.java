@@ -89,9 +89,9 @@ public class BranchstoreServiceImpl extends ServiceImpl<BranchstoreMapper, Branc
     @Transactional
     public void removeWithRoute(BranchDto branchDto) {
         this.removeById(branchDto);
+        System.out.println("branchDtoId = " + branchDto.getId());
         LambdaQueryWrapper<BranchRoute> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(BranchRoute::getBranchId,branchDto.getId());
         branchRouteService.remove(queryWrapper);
-
     }
 }

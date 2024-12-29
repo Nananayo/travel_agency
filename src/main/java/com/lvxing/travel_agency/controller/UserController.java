@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -53,8 +54,8 @@ public class UserController {
     }
     @GetMapping("/page")
     @ApiOperation("分页查询")
-    public R<Page> page(int page, int pageSize,String name){
-        Page<User> pageInfo = new  Page(page,pageSize);
+    public R<Page> page(Page page,String name){
+        Page<User> pageInfo = new  Page(page.getCurrent(),page.getSize());
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(name != null,User::getName,name);
         userService.page(pageInfo,queryWrapper);
@@ -73,7 +74,7 @@ public class UserController {
     }
     @PostMapping("/login")
     @ApiOperation("用户登录")
-    public R<String> login(@RequestBody Map map, HttpSession session){
+    public R<String> login(@RequestBody Map map, HttpSession session,HttpServletRequest request){
         log.info(map.toString());
 
         //获取手机号
@@ -105,10 +106,10 @@ public class UserController {
             }
             session.setAttribute("user",user.getId());
             session.setAttribute("power",user.getPower());
+            ServletContext sc = request.getServletContext();
+            sc.setAttribute(session.getId(),session);
 
-            //如果用户登录成功 删除缓存中的验证码
-            //redisTemplate.delete(phone);
-            return R.success("登录成功");
+            return R.success(session.getId());
         }
         return R.error("登录失败");
     }

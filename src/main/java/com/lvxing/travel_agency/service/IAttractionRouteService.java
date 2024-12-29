@@ -1,7 +1,9 @@
 package com.lvxing.travel_agency.service;
 
+import com.lvxing.travel_agency.dto.BranchDto;
 import com.lvxing.travel_agency.entity.AttractionRoute;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -13,4 +15,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IAttractionRouteService extends IService<AttractionRoute> {
 
+
+
+    @Transactional
+    void getAttractionRouteByAttraction(BranchDto branchDto);
 }

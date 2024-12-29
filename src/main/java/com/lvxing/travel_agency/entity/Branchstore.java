@@ -37,6 +37,7 @@ public class Branchstore implements Serializable {
     private String provinceName;
     private String cityName;
     private String districtName;
+    private String phone;
 
 
 }

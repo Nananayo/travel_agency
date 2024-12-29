@@ -4,27 +4,22 @@ package com.lvxing.travel_agency.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lvxing.travel_agency.common.R;
-import com.lvxing.travel_agency.entity.Branchstore;
+import com.lvxing.travel_agency.entity.AttractionRoute;
 import com.lvxing.travel_agency.entity.Employee;
 import com.lvxing.travel_agency.entity.EmployeeAll;
+import com.lvxing.travel_agency.service.IEmployeeAllService;
 import com.lvxing.travel_agency.service.IEmployeeService;
-//import com.lvxing.travel_agency.utils.JwtUtils;
-import com.lvxing.travel_agency.utils.JwtUtil;
+import com.lvxing.travel_agency.service.Impl.EmployeeAllServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -32,24 +27,24 @@ import java.util.Map;
  * </p>
  *
  * @author author
- * @since 2024-10-08
+ * @since 2024-11-28
  */
 @RestController
-@RequestMapping("/employee")
 @Slf4j
-@Api(tags = "员工接口")
-public class EmployeeController {
+@Api(tags = "总操作员接口")
+@RequestMapping("/employee-all")
+public class EmployeeAllController {
     @Autowired
-    private IEmployeeService employeeService;
+    private IEmployeeAllService employeeAllService;
     @PostMapping("/login")
     @ApiOperation("员工登入")
-    public R<String> login(HttpServletRequest request, HttpSession session, @RequestBody Employee employee) {
+    public R<String> login(HttpServletRequest request, HttpSession session, @RequestBody EmployeeAll employee) {
 
         String password = employee.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Employee::getUsername, employee.getUsername());
-        employee = employeeService.getOne(queryWrapper);
+        LambdaQueryWrapper<EmployeeAll> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(EmployeeAll::getUsername, employee.getUsername());
+        employee = employeeAllService.getOne(queryWrapper);
         if(employee == null){
             return R.error("用户名不存在");
         }
@@ -59,9 +54,29 @@ public class EmployeeController {
         if(employee.getStatus() ==0){
             return R.error("账号已禁用");
         }
+        request.getSession().setAttribute("employeeall", employee.getId());
+//            Map<String , Object> claims = new HashMap<>();
+//            claims.put("id", employee.getId());
+//            claims.put("username",employee.getUsername());
+//            claims.put("name",employee.getName());
 
-        request.getSession().setAttribute("employee", employee.getId());
+        //使用JWT工具类，生成身份令牌
+//            String token = JwtUtils.generateJwt(claims);
+//            return R.success("aa");
+
+
+//        log.info("登录成功...");
+//        ServletContext sc = request.getServletContext();
+//        sc.setAttribute("employee", employee.getId());
+//
+        
         return R.success(session.getId());
+
+
+//        HashMap<String, String> plMap = new HashMap<>();
+//        plMap.put("username", employee.getUsername());
+//        String token = JwtUtil.getToken(plMap);
+//        return R.success(token);
 
     }
     @PostMapping("/logout")
@@ -72,7 +87,7 @@ public class EmployeeController {
     }
     @PostMapping
     @ApiOperation("新增员工")
-    public R<String> save(@RequestBody Employee employee){
+    public R<String> save(@RequestBody EmployeeAll employee){
         if (employee.getId() != null){
             R.error("不许填ID");
         }
@@ -82,82 +97,66 @@ public class EmployeeController {
         if (employee.getName() == null){
             R.error("没填员工名");
         }
-        if (employee.getUsername() == null){
-            R.error("没填用户名");
-        }
-        if (employee.getUsername() == null){
-            R.error("没填用户名");
-        }
         log.info("新增员工成功，员工信息为{}",employee.toString());
 //        employee.setCreateTime(LocalDateTime.now());
 //        employee.setUpdateTime(LocalDateTime.now());
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        employeeService.save(employee);
+        employeeAllService.save(employee);
         return R.success("新增员工成功");
     }
     @GetMapping("/page")
     @ApiOperation("分页查询员工信息")
-    public R<Page> page(Page page,String name){
+    public R<Page> page(Page page, String name){
         if (name == null){
-            Page<Employee> pageInfo = new Page(page.getCurrent(),page.getSize());
-            LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-            employeeService.page(pageInfo,queryWrapper);
+            Page<EmployeeAll> pageInfo = new Page(page.getCurrent(),page.getSize());
+            LambdaQueryWrapper<EmployeeAll> queryWrapper = new LambdaQueryWrapper<>();
+            employeeAllService.page(pageInfo,queryWrapper);
             return R.success(pageInfo);
         }
 
         if(page == null ){
             return R.error("参数错误");
         }
-        Page<Employee> pageInfo = new Page(page.getCurrent(),page.getSize());
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(Employee::getName,name);
-        employeeService.page(pageInfo,queryWrapper);
+        Page<EmployeeAll> pageInfo = new Page(page.getCurrent(),page.getSize());
+        LambdaQueryWrapper<EmployeeAll> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(EmployeeAll::getName,name);
+        employeeAllService.page(pageInfo,queryWrapper);
 
         log.info("pageInfo:{}",pageInfo);
         return R.success(pageInfo);
     }
     @PutMapping
     @ApiOperation("更新员工信息")
-    public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
-        if (employee.getName() == null){
-            return R.error("员工名不能为空");
-        }
-        if (employee.getId()==null){
-            return R.error("id不能为空");
-        }
-        if (employee.getPhone()==null){
-            return R.error("phone不能为空");
-        }
-        if (employee.getGender()==null){
-            return R.error("性别不能为空");
-        }
+    public R<String> update(HttpServletRequest request,@RequestBody EmployeeAll employee){
         log.info("员工信息为{}",employee.toString());
 //        Long empId = (Long) request.getSession().getAttribute("employee");
 //        employee.setUpdateTime(LocalDateTime.now());
 //        employee.setUpdateUser(empId);
-        employeeService.updateById(employee);
+        employeeAllService.updateById(employee);
         return R.success("员工信息修改成功");
     }
     @GetMapping("/{id}")
     @ApiOperation("根据id查询员工信息")
-    public R<Employee> getById(@PathVariable Long id){
-        Employee employee = employeeService.getById(id);
+    public R<EmployeeAll> getById(@PathVariable Long id){
+        EmployeeAll employee = employeeAllService.getById(id);
         if (employee != null){
             return R.success(employee);
         }
         return R.error("没有查询到对应员工信息");
+
     }
     @DeleteMapping
-    @ApiOperation("删除员工")
-    public R<String> delete(long id){
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Employee::getId,id);
-        List<Employee> list = employeeService.list(queryWrapper);
+    @ApiOperation("删除总店操作员")
+    public R<String> delete(long ids){
+        LambdaQueryWrapper<EmployeeAll> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(EmployeeAll::getId,ids);
+        List<EmployeeAll> list = employeeAllService.list(queryWrapper);
         if (list == null){
             return R.error("删除失败");
         }
-        employeeService.removeById(id);
+        employeeAllService.removeById(ids);
         return R.success("删除成功");
     }
+
 
 }

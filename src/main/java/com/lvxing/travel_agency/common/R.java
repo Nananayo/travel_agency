@@ -1,5 +1,6 @@
 package com.lvxing.travel_agency.common;
 
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -8,10 +9,12 @@ public class R<T> implements Serializable {
     private Integer code;
     private String msg;
     private Object data;
+    private Integer power;
     public static <T> R<T> success(T object){
         R<T> r = new R<T>();
         r.data= object;
         r.code = 1;
+        r.power = 0;
         return r;
     }
     public static <T> R<T> error(String msg){

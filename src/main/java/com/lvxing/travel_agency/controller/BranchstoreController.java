@@ -10,6 +10,7 @@ import com.lvxing.travel_agency.service.IBranchstoreService;
 import com.lvxing.travel_agency.service.IRouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -42,13 +43,37 @@ public class BranchstoreController {
     }
     @GetMapping("/page")
     @ApiOperation("分页查询分店")
-    public R<Page> page(int page, int pageSize, String name){
-        Page<Branchstore> pageInfo = new Page(page,pageSize);
+    public R<Page> page(Page page,String name){
+        if (name == null){
+            Page<Branchstore> pageInfo = new Page(page.getCurrent(),page.getSize());
+            LambdaQueryWrapper<Branchstore> queryWrapper = new LambdaQueryWrapper<>();
+            branchService.page(pageInfo,queryWrapper);
+            return R.success(pageInfo);
+        }
+
+        if(page == null ){
+            return R.error("参数错误");
+        }
+        Page<Branchstore> pageInfo = new Page(page.getCurrent(),page.getSize());
         LambdaQueryWrapper<Branchstore> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(name != null,Branchstore::getName,name);
+        queryWrapper.like(Branchstore::getName,name);
         branchService.page(pageInfo,queryWrapper);
+
         log.info("pageInfo:{}",pageInfo);
         return R.success(pageInfo);
+    }
+
+    @GetMapping("/search")
+    @ApiOperation("搜索分店")
+    public R<List<Branchstore>> Search(String name){
+        if(name == null ){
+            return R.error("参数错误");
+        }
+        LambdaQueryWrapper<Branchstore> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(Branchstore::getName,name);
+        List<Branchstore> list = branchService.list(queryWrapper);
+
+        return R.success(list);
     }
     @GetMapping("/list")
     @ApiOperation("获取分店列表")
@@ -62,7 +87,9 @@ public class BranchstoreController {
     @PutMapping("/update")
     @ApiOperation("更新分店信息")
     public R<String> update(@RequestBody BranchDto branchDto){
-
+        if(branchDto.getId() == null){
+            return R.error("id为空");
+        }
         branchService.updateWithRoute(branchDto);
         return R.success("修改成功");
     };

@@ -51,9 +51,9 @@ public class Employee implements Serializable {
     private String phone;
 
     /**
-     * 所属分社/总店
+     * 邮箱
      */
-    private String belong;
+    private String email;
 
     /**
      * 权限
@@ -69,13 +69,13 @@ public class Employee implements Serializable {
      * 身份证号
      */
     private Long idCart;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    @TableField(fill = FieldFill.INSERT)
+
     private Long createUser;
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
 
 

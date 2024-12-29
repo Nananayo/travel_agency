@@ -7,6 +7,7 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * <p>
@@ -37,7 +38,10 @@ public class BranchRoute implements Serializable {
     private String branchName;
     
     private String routeName;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
 
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
 }
